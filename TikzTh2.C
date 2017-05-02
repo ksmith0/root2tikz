@@ -1,8 +1,7 @@
-/**Script to output a 2D TiKz pgfplot from a ROOT TH2.
+/**Script to output a 2D TikZ pgfplot from a ROOT TH2.
  *
  * @author Karl Smith
- *
- *
+ * @date May 1, 2017
  */
 
 #include <iostream>
@@ -11,6 +10,20 @@
 
 #include "TH2.h"
 
+/**By default creates a TikZ matrix plot which is typically used to plot values
+ * in a matrix, but can be easily adapted to a two-dimensional histogram. A
+ * matrix plot requires that all bins are defined, and thus the option
+ * "restrict z to domain*" is used so that empty bins are set to the minimum
+ * value. If the option "surf" is provided a surface plot is created instead,
+ * this type of plot requires data at the corners to be provided and thus plots
+ * one less bin than is contained in the input histogram.
+ *
+ * @param[in] hist The ROOT histogram to be converted to TikZ output.
+ * @param[in] outputFilename Optional filename of the TikZ output. If no name
+ * 	is provided the output is directed to the standard output.
+ * @param[in] options Options for the TikZ output.
+ * 	* surf Create a surface plot instead of a matrix plot.
+ */
 void TikzTh2(TH2* hist, std::string outputFilename="", std::string options="") {
 	bool surfPlot = false;
 	if (options.find("surf") != std::string::npos) {
@@ -54,7 +67,9 @@ void TikzTh2(TH2* hist, std::string outputFilename="", std::string options="") {
 			"\t\t\%Colorbar limits:\n"
 			"\t\tpoint meta min=" << hist->GetMinimum() << ", "
 			"point meta max=" << hist->GetMaximum() << ",\n"
-			"\t\trestrict z to domain*=" << hist->GetBinContent(hist->GetMinimumBin()) << ":" << hist->GetBinContent(hist->GetMaximumBin()) << "]\n"
+			"\t\trestrict z to domain*=" <<
+				hist->GetBinContent(hist->GetMinimumBin()) << ":" <<
+				hist->GetBinContent(hist->GetMaximumBin()) << "]\n"
 		"\t]\n\n";
 
 	output <<
