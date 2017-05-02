@@ -60,22 +60,21 @@ void TikzTH1(TH1* hist, const std::string &outputFilename="", std::string option
 	}
 	else output << "const plot, no marks";
 	output << "]\n"
-		"\t\tcoordinates {\n";
+		"\t\tcoordinates { ";
 
-	if (!includeErrors) output << "\t\t\t(" << hist->GetBinLowEdge(1) << ",0)";
+	if (!includeErrors) output << "(" << hist->GetBinLowEdge(1) << ",0) ";
 	for (int xbin=1; xbin <= hist->GetNbinsX(); xbin++) {
-		output << "\t\t\t(";
+		output << "(";
 		if (includeErrors) output << hist->GetBinCenter(xbin);
 		else output << hist->GetBinLowEdge(xbin);
 		output << "," << hist->GetBinContent(xbin) << ") ";
 		if (includeErrors) output << " +- (" << hist->GetBinWidth(xbin) << "," << hist->GetBinError(xbin) << ") ";
-		output << "\n";
 	}
 	if (!includeErrors) {
-		output << "\t\t\t(" << hist->GetBinLowEdge(hist->GetNbinsX()) + 
-			hist->GetBinWidth(hist->GetNbinsX()) << "," << 0 << ")";
+		output << "(" << hist->GetBinLowEdge(hist->GetNbinsX()) +
+			hist->GetBinWidth(hist->GetNbinsX()) << "," << 0 << ") ";
 	}
-	output << "\n\t\t};\n";
+	output << "};\n";
 
 	output <<
 		"\t\\end{axis}\n"
