@@ -68,7 +68,8 @@ void TikzTH1(TH1* hist, const std::string &outputFilename="", std::string option
 		if (includeErrors) output << hist->GetBinCenter(xbin);
 		else output << hist->GetBinLowEdge(xbin);
 		output << "," << hist->GetBinContent(xbin) << ") ";
-		if (includeErrors) output << " +- (" << hist->GetBinWidth(xbin) << "," << hist->GetBinError(xbin) << ") ";
+		if (includeErrors) output << " +- (" << hist->GetBinWidth(xbin) / 2 <<
+			"," << hist->GetBinError(xbin) << ") ";
 	}
 	if (!includeErrors) {
 		output << "(" << hist->GetBinLowEdge(hist->GetNbinsX()) +
