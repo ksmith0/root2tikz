@@ -21,7 +21,7 @@
  * 	* E    - Draw error bars, show only the bars no markers or lines.
  * 	* E1   - Draw error bars with small lines at end and show markers.
  */
-void TikzTH1(TH1* hist, const std::string &outputFilename="", std::string options="") {
+void TikzTh1(TH1* hist, const std::string &outputFilename="", std::string options="") {
 	bool includeErrors = false; //Include errors, shows only the error bars, no markers. ROOT option E.
 	bool errorMarks = false; //Small lines are darwn at end of the error bars and markers are shown. ROOT option E1. 
 	if (options.find("E") != std::string::npos) includeErrors = true;

@@ -1,3 +1,6 @@
-#Tempory files
+#Temporary files
 .*.swp
 
+#Ignore directories.
+build/
+install/
