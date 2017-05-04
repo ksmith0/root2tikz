@@ -26,3 +26,6 @@ include_directories(include)
 #Add the source directory.
 add_subdirectory(source)
 
+#Add a environment module file
+configure_file("share/modulefiles/root2tikz" root2tikz @ONLY)
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/root2tikz DESTINATION share/modulefiles/)

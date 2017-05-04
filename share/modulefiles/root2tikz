@@ -1,0 +1,18 @@
+#%Module1.0
+##
+## root2tikz modulefile
+##
+
+proc ModulesHelp {} {
+	global version
+	puts stderr "root2tikz - Tool for outputing ROOT graphics to pgfplots (TikZ).\n"
+}
+
+module-whatis "Loads the root2tikz package for converting ROOT plots to pgfplots."
+
+set prefix @CMAKE_INSTALL_PREFIX@
+
+append-path LD_LIBRARY_PATH $prefix/lib 
+append-path DYLD_LIBRARY_PATH $prefix/lib 
+append-path LIBRARY_PATH $prefix/lib 
+append-path CPLUS_INCLUDE_PATH $prefix/include
