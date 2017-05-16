@@ -6,6 +6,7 @@
 #define TIKZPLOT_HPP
 
 #include <array>
+#include <iostream>
 #include <string>
 #include <utility>
 #include <vector>
@@ -30,6 +31,10 @@ class TikzPlot{
 
 		/// Write the TikZ output to the given filename.
 		void Write(const std::string &filename = "");
+
+		/// Write out the TikZ addplot command for the given arguments.
+		static void PlotTH1(const TH1* hist, const std::string &options,
+				std::streambuf *buf = std::cout.rdbuf());
 
 	private:
 		/// A vector of histograms and plot options.
