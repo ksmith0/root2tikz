@@ -21,10 +21,10 @@ class TikzPlot{
 		TikzPlot(TVirtualPad *pad);
 
 		/// Add a one-dimensional histogram to the plot.
-		void Add(TH1* hist, const std::string &options);
+		void Add(TH1* hist, const std::string &options = "");
 
 		/// Add a two-dimensional histogram to the plot.
-		void Add(TH2* hist, const std::string &options);
+		void Add(TH2* hist, const std::string &options = "");
 
 		/// Specify the log mode for a given axis.
 		void SetLog(const short &axis, const bool &logMode = true);

@@ -20,7 +20,7 @@ TikzPlot::TikzPlot() :
  * \param[in] hist A pointer to the histogram to be converted to a TikZ object.
  * \param[in] options Plotting options. See PlotTH1 for currently supported options.
  */
-void TikzPlot::Add(TH1* hist, const std::string &options) {
+void TikzPlot::Add(TH1* hist, const std::string &options /* = "" */) {
 	hists_.push_back(std::make_pair(hist, options));
 	if (axisTitles_.at(0) == "") axisTitles_.at(0) = hist->GetXaxis()->GetTitle();
 	if (axisTitles_.at(1) == "") axisTitles_.at(1) = hist->GetYaxis()->GetTitle();
@@ -30,7 +30,7 @@ void TikzPlot::Add(TH1* hist, const std::string &options) {
  * \param[in] hist A pointer to the histogram to be converted to a TikZ object.
  * \param[in] options Plotting options.
  */
-void TikzPlot::Add(TH2* hist, const std::string &options) {
+void TikzPlot::Add(TH2* hist, const std::string &options /* = "" */) {
 	if (! hists_.empty()) {
 		std::cerr << "ERROR: Multiple TH2 plotting is not currently supported, request ignored!\n";
 		return;
