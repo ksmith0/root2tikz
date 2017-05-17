@@ -5,8 +5,7 @@ ROOT_GENERATE_DICTIONARY(root2tikzDict
 	MODULE root2tikz)
 
 #Create the root2tikz library with the ROOT dictionary.
-add_library(root2tikz SHARED TikzPlot.cpp
-	TikzTh2.cpp root2tikzDict)
+add_library(root2tikz SHARED TikzPlot.cpp root2tikzDict)
 
 #Link to ROOT.
 target_link_libraries(root2tikz ${ROOT_LIBRARIES})
