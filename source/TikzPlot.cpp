@@ -58,8 +58,6 @@ void TikzPlot::Add(TH2* hist, const std::string &options /* = "" */) {
 	if (axisTitles_.at(1) == "") axisTitles_.at(1) = hist->GetYaxis()->GetTitle();
 }
 
-
-
 void TikzPlot::SetLog(const short &axis, const bool &logMode /* = true */) {
 	if (axis >= 3) {
 		std::cerr << "ERROR: TikzPlot::SetLog called for invalid axis index: " << axis << "!\n";
@@ -67,6 +65,28 @@ void TikzPlot::SetLog(const short &axis, const bool &logMode /* = true */) {
 	}
 
 	logMode_.at(axis) = logMode;
+}
+
+std::string TikzPlot::GetLatexString(std::string str) {
+	//Replace # with \ and wrap in $.
+	std::size_t loc = str.find_first_of("#");
+	while (loc != std::string::npos) {
+		str[loc] = '\\';
+		str.insert(loc++, "$");
+		loc = str.find_first_not_of("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ", loc+1);
+		str.insert(loc, "$");
+		loc = str.find_first_of("#", loc);
+	}
+	//Wrap math commands in $
+	loc = str.find_first_of("{");
+	while (loc != std::string::npos) {
+		loc = str.find_last_of(" \\^_", loc);
+		str.insert(loc++, "$");
+		loc = str.find_first_of("}", loc+1);
+		str.insert(++loc, "$");
+		loc = str.find_first_of("{", loc);
+	}
+	return str;
 }
 
 /**Creates a TikZ picture using the content from the provided histogram. THe
@@ -87,8 +107,8 @@ void TikzPlot::Write(const std::string &filename /* = "" */) {
 	output << 
 		"\\begin{tikzpicture}\n"
 		"\t\\begin{axis}[\n"
-		"\t\txlabel={" << axisTitles_.at(0) <<  "},\n"
-		"\t\tylabel={" << axisTitles_.at(1) <<  "},\n"
+		"\t\txlabel={" << GetLatexString(axisTitles_.at(0)) <<  "},\n"
+		"\t\tylabel={" << GetLatexString(axisTitles_.at(1)) <<  "},\n"
 		"\t\txmin=" << axisLimits_.at(0).first << ", "
 		"xmax=" << axisLimits_.at(0).second << ",\n"
 		"\t\tymin=" << axisLimits_.at(1).first << ","
@@ -262,4 +282,16 @@ void TikzPlot::PlotTH2(const TH2 *hist, const std::string &options,
 
 	//Coordinate list trailer.
 	output << "\t\t};\n";
+}
+
+/**TikZ is capable of using a previously rendered image and placing it within
+ * axes that are rendered by TikZ. This can be useful in situations when
+ * rendering a histogram with TikZ would be too time consuming, such as a 2D
+ * histogram with many bins.
+ *
+ * \param[in] imageName The name of the output image to be used in TikZ plot.
+ * 	Setting this to an empty string disables this feature.
+ */
+void TikzPlot::SetRootRender(const std::string &imageName) {
+	imageName_ = imageName;
 }

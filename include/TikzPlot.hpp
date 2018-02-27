@@ -40,6 +40,11 @@ class TikzPlot{
 		static void PlotTH2(const TH2* hist, const std::string &options,
 				std::streambuf *buf = std::cout.rdbuf());
 
+		/// Switch specifying if ROOT should be used to render histogram contents.
+		void SetRootRender(const std::string &imageName);
+
+		static std::string GetLatexString(std::string str);
+
 	private:
 		/// A vector of histograms and plot options.
 		std::vector< std::pair< TH1*, std::string > > hists_;
@@ -54,6 +59,8 @@ class TikzPlot{
 
 		/// A flag indicating that a 2D hist. is to be output in a color scale.
 		bool is2dColor_;
+
+		std::string imageName_;
 
 };
 
