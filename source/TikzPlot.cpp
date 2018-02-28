@@ -98,6 +98,20 @@ std::string TikzPlot::GetLatexString(std::string str) {
 	return str;
 }
 
+std::string TikzPlot::LogModeOptions() {
+	std::vector<std::string> options;
+	if (logMode_.at(0)) options.push_back("xmode=log, ");
+	if (logMode_.at(1)) options.push_back("ymode=log, ");
+	if (logMode_.at(2)) options.push_back("zmode=log, ");
+
+	std::string output = "";
+	for (auto item : options) {
+		output.append(item);
+	}
+
+	return output;
+}
+
 /**Creates a TikZ picture using the content from the provided histogram. THe
  * options passed control the output style.
  *
@@ -116,6 +130,7 @@ void TikzPlot::Write(const std::string &filename /* = "" */) {
 	output << 
 		"\\begin{tikzpicture}\n"
 		"\t\\begin{axis}[\n"
+		"\t\t" << LogModeOptions() << "\n"
 		"\t\txlabel={" << GetLatexString(axisTitles_.at(0)) <<  "},\n"
 		"\t\tylabel={" << GetLatexString(axisTitles_.at(1)) <<  "},\n"
 		"\t\txmin=" << axisLimits_.at(0).first << ", "

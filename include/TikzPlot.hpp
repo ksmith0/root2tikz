@@ -62,6 +62,9 @@ class TikzPlot{
 
 		std::string imageName_;
 
+		/// Generate the tikz plot options for log mode.
+		std::string LogModeOptions();
+
 };
 
 #endif //TIKZPLOT_HPP
