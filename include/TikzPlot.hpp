@@ -43,7 +43,11 @@ class TikzPlot{
 		/// Switch specifying if ROOT should be used to render histogram contents.
 		void SetRootRender(const std::string &imageName);
 
+		/// Converts a ROOT TLatex string to a valid LaTeX string.
 		static std::string GetLatexString(std::string str);
+
+		/// Specify a colorbrewer2 palette to be used.
+		void SetPalette(std::string colorbrewer2_palette);
 
 	private:
 		/// A vector of histograms and plot options.
@@ -61,6 +65,9 @@ class TikzPlot{
 		bool is2dColor_;
 
 		std::string imageName_;
+
+		/// Name of the colorbrewer2 palette to be used.
+		std::string colorbrewer2_palette_;
 
 		/// Generate the tikz plot options for log mode.
 		std::string LogModeOptions();

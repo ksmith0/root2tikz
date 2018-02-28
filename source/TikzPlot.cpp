@@ -11,7 +11,7 @@
 #include <TH1.h>
 
 TikzPlot::TikzPlot() :
-	logMode_({false}), is2dColor_(false)
+	logMode_({false}), is2dColor_(false), colorbrewer2_palette_("")
 {
 
 }
@@ -76,6 +76,27 @@ void TikzPlot::SetLog(const short &axis, const bool &logMode /* = true */) {
 	logMode_.at(axis) = logMode;
 }
 
+/** Makes use of the colorbrewer package which uses the palette on http://colorbrewer2.org
+ *
+ * \param[in] colorbrewer2_palette Name of the palette to be used.
+ */
+void TikzPlot::SetPalette(std::string colorbrewer2_palette) {
+	std::vector<std::string> valid_set_names = {"Set1", "Set2", "Set3", "Dark2", "Paired", "Pastel1", "Pastel2", "Accent"};
+
+	//Check if the first part of the palette matches known sets.
+	bool palette_found = false;
+	for (auto name : valid_set_names) {
+		if (colorbrewer2_palette.find(name) != std::string::npos) {
+			palette_found = true;
+			break;
+		}
+	}
+	if (!palette_found) {
+		std::cerr << "WARNING: Colorbrewer2 palette '" << colorbrewer2_palette << "' may not exist.\n";
+	}
+	colorbrewer2_palette_ = colorbrewer2_palette;
+}
+
 std::string TikzPlot::GetLatexString(std::string str) {
 	//Replace # with \ and wrap in $.
 	std::size_t loc = str.find_first_of("#");
@@ -126,6 +147,11 @@ void TikzPlot::Write(const std::string &filename /* = "" */) {
 		buf = outputStream.rdbuf();
 	}
 	std::ostream output(buf);
+
+	if (colorbrewer2_palette_ != "") {
+		output << "\\usepgfplotslibrary{colorbrewer}\n"
+			"\\pgfplotsset{cycle list/" << colorbrewer2_palette_ << "}\n";
+	}
 
 	output << 
 		"\\begin{tikzpicture}\n"
