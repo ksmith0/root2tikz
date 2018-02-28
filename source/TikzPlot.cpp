@@ -28,6 +28,15 @@ void TikzPlot::Add(TH1* hist, const std::string &options /* = "" */) {
 	hists_.push_back(std::make_pair(hist, options));
 	if (axisTitles_.at(0) == "") axisTitles_.at(0) = hist->GetXaxis()->GetTitle();
 	if (axisTitles_.at(1) == "") axisTitles_.at(1) = hist->GetYaxis()->GetTitle();
+
+	//Get the axis limits.
+	if (axisLimits_.at(0).first > hist->GetXaxis()->GetXmin()) axisLimits_.at(0).first = hist->GetXaxis()->GetXmin();
+	if (axisLimits_.at(0).second < hist->GetXaxis()->GetXmax()) axisLimits_.at(0).second = hist->GetXaxis()->GetXmax();
+
+	double ymin, ymax;
+	hist->GetMinimumAndMaximum(ymin, ymax);
+	if (axisLimits_.at(1).first > ymin) axisLimits_.at(1).first = 0.9 * ymin;
+	if (axisLimits_.at(1).second < ymax) axisLimits_.at(1).second = 1.1 * ymax;
 }
 
 /**
@@ -111,7 +120,7 @@ void TikzPlot::Write(const std::string &filename /* = "" */) {
 		"\t\tylabel={" << GetLatexString(axisTitles_.at(1)) <<  "},\n"
 		"\t\txmin=" << axisLimits_.at(0).first << ", "
 		"xmax=" << axisLimits_.at(0).second << ",\n"
-		"\t\tymin=" << axisLimits_.at(1).first << ","
+		"\t\tymin=" << axisLimits_.at(1).first << ", "
 		"ymax=" << axisLimits_.at(1).second;
 
 	if (is2dColor_) {
