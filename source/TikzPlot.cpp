@@ -76,7 +76,8 @@ void TikzPlot::SetLog(const short &axis, const bool &logMode /* = true */) {
 	logMode_.at(axis) = logMode;
 }
 
-/** Makes use of the colorbrewer package which uses the palette on http://colorbrewer2.org
+/** Makes use of the colorbrewer package which uses the palette on
+ *  http://colorbrewer2.org
  *
  * \param[in] colorbrewer2_palette Name of the palette to be used.
  */
@@ -153,7 +154,7 @@ void TikzPlot::Write(const std::string &filename /* = "" */) {
 			"\\pgfplotsset{cycle list/" << colorbrewer2_palette_ << "}\n";
 	}
 
-	output << 
+	output <<
 		"\\begin{tikzpicture}\n"
 		"\t\\begin{axis}[\n"
 		"\t\t" << LogModeOptions() << "\n"

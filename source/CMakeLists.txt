@@ -1,11 +1,21 @@
 #Generate a ROOT dictionary.
 ROOT_GENERATE_DICTIONARY(root2tikzDict
 	../include/TikzPlot.hpp
+	PgfPlotsPlot.hpp
+	PgfPlotsAxis.hpp
+	TikzPicture.hpp
 	LINKDEF ../include/root2tikz_LinkDef.h
 	MODULE root2tikz)
 
+set(ROOT2TIKZ_SOURCES
+		TikzPlot.cpp
+		PgfPlotsPlot.cpp
+		PgfPlotsAxis.cpp
+		TikzPicture.cpp
+	)
+
 #Create the root2tikz library with the ROOT dictionary.
-add_library(root2tikz SHARED TikzPlot.cpp root2tikzDict)
+add_library(root2tikz SHARED ${ROOT2TIKZ_SOURCES} root2tikzDict)
 
 #Link to ROOT.
 target_link_libraries(root2tikz ${ROOT_LIBRARIES})
