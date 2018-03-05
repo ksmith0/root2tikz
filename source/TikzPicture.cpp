@@ -2,14 +2,20 @@
 
 #include <fstream>
 
+#include "PgfPlotsGroupPlot.hpp"
+
 TikzPicture::TikzPicture(const std::string &options, const std::string &preamble)
 	: options_(options), preamble_(preamble), colorbrewer2_palette_("")
 {
 
 }
 
-void TikzPicture::AddAxis(PgfPlotsAxis* axis) {
-	axes_.push_back(axis);
+void TikzPicture::Add(PgfPlotsAxis* obj) {
+	axes_.push_back(obj);
+
+	if (dynamic_cast<PgfPlotsGroupPlot*>(obj)) {
+		preamble_.append("\n\\usepgfplotslibrary{groupplots}");
+	}
 }
 
 /** Makes use of the colorbrewer package which uses the palette on

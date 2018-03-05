@@ -51,13 +51,13 @@ void PgfPlotsAxis::AddPlot(PgfPlotsPlot *plot) {
 void PgfPlotsAxis::SetLog(const short &axis, const bool &logMode /* = true */) {
 	std::string optionName;
 	switch (axis) {
-		case 1:
+		case 0:
 			optionName = "xmode";
 			break;
-		case 2:
+		case 1:
 			optionName = "ymode";
 			break;
-		case 3:
+		case 2:
 			optionName = "zmode";
 			break;
 		default:
@@ -87,12 +87,21 @@ void PgfPlotsAxis::Write(std::streambuf *buf) {
 
 	output << "\t\t]\n\n";
 
-	for (auto plot : plots_) {
-		plot->Write(buf);
-	}
+	WriteRegisteredItems(buf);
 
 	output << "\t" << EnvFooter() << "\n";
 }
+
+/** Write the registered plots to the specified buffer.
+ *
+ * \param[in] buf The buffer that the plot should be written into.
+ */
+void PgfPlotsAxis::WriteRegisteredItems(std::streambuf *buf) {
+	for (auto plot : plots_) {
+		plot->Write(buf);
+	}
+}
+
 
 /** Convert ROOT TLatex syntax into proper LaTeX syntax.
  *

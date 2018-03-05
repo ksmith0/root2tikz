@@ -30,18 +30,22 @@ class PgfPlotsAxis {
 		/// Write out the axis and registered plots.
 		void Write(std::streambuf *buf = std::cout.rdbuf());
 
+	protected:
+		/// Options for the axis command.
+		TikzOptions options_;
+
 	private:
 		/// Vector of registered plots.
 		std::vector< PgfPlotsPlot* > plots_;
 
-		/// Options for the axis command.
-		TikzOptions options_;
-
 		/// The LaTeX command starting the environment.
-		std::string EnvHeader() {return "\\begin{axis}";};
+		virtual std::string EnvHeader() {return "\\begin{axis}";};
 
 		/// The LaTeX command ending the environment.
-		std::string EnvFooter() {return "\\end{axis}";};
+		virtual std::string EnvFooter() {return "\\end{axis}";};
+
+		/// Write out all registered items.
+		virtual void WriteRegisteredItems(std::streambuf *buf);
 };
 
 #endif //PGFPLOTSAXIS_HPP

@@ -14,8 +14,8 @@ class TikzPicture {
 	public:
 		TikzPicture(const std::string &options="", const std::string &preamble="");
 
-		/// Add an axis to this picture.
-		void AddAxis(PgfPlotsAxis* axis);
+		/// Add an axis or group plot to this picture.
+		void Add(PgfPlotsAxis* obj);
 
 		/// Specify a colorbrewer2 palette to be used.
 		void SetPalette(std::string colorbrewer2_palette);
@@ -24,7 +24,7 @@ class TikzPicture {
 		void Write(const std::string &filename = "");
 
 	private:
-		/// The vecctor of registered axes.
+		/// The vector of registered axes.
 		std::vector< PgfPlotsAxis* > axes_;
 
 		/// Colorbrewer pallete
