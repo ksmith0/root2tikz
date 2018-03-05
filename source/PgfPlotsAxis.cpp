@@ -1,29 +1,104 @@
 #include "PgfPlotsAxis.hpp"
 
 PgfPlotsAxis::PgfPlotsAxis(const std::string &options)
-	: options_(options), logMode_({false})
 {
-
+	options_.AddOptions(options);
 }
 
+/** Add a plot to this axis.
+ *
+ * \param[in] plot The plot to be added.
+ */
 void PgfPlotsAxis::AddPlot(PgfPlotsPlot *plot) {
 	plots_.push_back(plot);
 
 	const TH1* hist = plot->GetHist();
 
-	if (axisTitles_.at(0) == "") axisTitles_.at(0) = hist->GetXaxis()->GetTitle();
-	if (axisTitles_.at(1) == "") axisTitles_.at(1) = hist->GetYaxis()->GetTitle();
+	if (options_.find("xlabel") == options_.end()) {
+		options_["xlabel"] = "{" + GetLatexString(hist->GetXaxis()->GetTitle()) + "}";
+	}
+	if (options_.find("ylabel") == options_.end()) {
+		options_["ylabel"] = "{" + GetLatexString(hist->GetYaxis()->GetTitle()) + "}";
+	}
 
 	//Get the axis limits.
-	if (axisLimits_.at(0).first > hist->GetXaxis()->GetXmin()) axisLimits_.at(0).first = hist->GetXaxis()->GetXmin();
-	if (axisLimits_.at(0).second < hist->GetXaxis()->GetXmax()) axisLimits_.at(0).second = hist->GetXaxis()->GetXmax();
+	std::string *xmin = &options_["xmin"];
+	if (*xmin == "" || std::stod(*xmin) > hist->GetXaxis()->GetXmin()) {
+		*xmin = std::to_string(hist->GetXaxis()->GetXmin());
+	}
+	std::string *xmax = &options_["xmax"];
+	if (*xmax == "" || std::stod(*xmax) > hist->GetXaxis()->GetXmax()) {
+		*xmax = std::to_string(hist->GetXaxis()->GetXmax());
+	}
 
-	double ymin, ymax;
-	hist->GetMinimumAndMaximum(ymin, ymax);
-	if (axisLimits_.at(1).first > ymin) axisLimits_.at(1).first = 0.9 * ymin;
-	if (axisLimits_.at(1).second < ymax) axisLimits_.at(1).second = 1.1 * ymax;
+	double histYMin, histYMax;
+	hist->GetMinimumAndMaximum(histYMin, histYMax);
+	std::string *ymin = &options_["ymin"];
+	if (*ymin == "" || std::stod(*ymin) > 0.9 * histYMin) {
+		*ymin = std::to_string(0.9 * histYMin);
+	}
+	std::string *ymax = &options_["ymax"];
+	if (*ymax == "" || std::stod(*ymax) > 1.1 * histYMax) {
+		*ymax = std::to_string(1.1 * histYMax);
+	}
 }
 
+/** Set log mode for a given axis.
+ *
+ * \param[in] axis Axis to set log mode for: x=0, y=1, z=2.
+ * \param[in] logMode Value of log mode, true for log plot.
+ */
+void PgfPlotsAxis::SetLog(const short &axis, const bool &logMode /* = true */) {
+	std::string optionName;
+	switch (axis) {
+		case 1:
+			optionName = "xmode";
+			break;
+		case 2:
+			optionName = "ymode";
+			break;
+		case 3:
+			optionName = "zmode";
+			break;
+		default:
+			std::cerr << "ERROR: TikzPlot::SetLog called for invalid axis index: " << axis << "!\n";
+			return;
+	}
+
+	if (logMode) {
+		options_[optionName] = "log";
+	} else {
+		options_.erase(optionName);
+	}
+}
+
+/** Write the axis and its registered plots to the specified buffer.
+ *
+ * \param[in] buf The buffer that the plot should be written into.
+ */
+void PgfPlotsAxis::Write(std::streambuf *buf) {
+	std::ostream output(buf);
+
+	output << "\t" << EnvHeader() << "[\n";
+
+	for (auto option : options_) {
+		output << "\t\t\t" << option.first << "=" << option.second << ",\n";
+	}
+
+	output << "\t\t]\n\n";
+
+	for (auto plot : plots_) {
+		plot->Write(buf);
+	}
+
+	output << "\t" << EnvFooter() << "\n";
+}
+
+/** Convert ROOT TLatex syntax into proper LaTeX syntax.
+ *
+ * \param[in] A ROOT TLatex string to be converted.
+ * \return A LaTeX formatted string.
+ */
 std::string PgfPlotsAxis::GetLatexString(std::string str) {
 	//Replace # with \ and wrap in $.
 	std::size_t loc = str.find_first_of("#");
@@ -46,61 +121,3 @@ std::string PgfPlotsAxis::GetLatexString(std::string str) {
 	return str;
 }
 
-/** Returns the options passed to a pgfplots axis for log mode.
- *
- *  \return log options for pgfplots axis.
- */
-std::string PgfPlotsAxis::LogModeOptions() {
-	std::string output = "";
-	if (logMode_.at(0)) output.append("xmode=log, ");
-	if (logMode_.at(1)) output.append("ymode=log, ");
-	if (logMode_.at(2)) output.append("zmode=log, ");
-
-	return output;
-}
-
-/** Set log mode for a given axis.
- *
- * \param[in] axis Axis to set log mode for: x=0, y=1, z=2.
- * \param[in] logMode Value of log mode, true for log plot.
- */
-void PgfPlotsAxis::SetLog(const short &axis, const bool &logMode /* = true */) {
-	if (axis >= 3) {
-		std::cerr << "ERROR: TikzPlot::SetLog called for invalid axis index: " << axis << "!\n";
-		return;
-	}
-
-	logMode_.at(axis) = logMode;
-}
-
-void PgfPlotsAxis::Write(std::streambuf *buf) {
-	std::ostream output(buf);
-
-	output << "\t\\begin{axis}[\n";
-
-	auto logModeOpts = LogModeOptions();
-	if (logModeOpts != "") {
-		output << "\t\t\t" << logModeOpts << "\n";
-	}
-
-	output <<
-		"\t\t\txlabel={" << GetLatexString(axisTitles_.at(0)) <<  "},\n"
-		"\t\t\tylabel={" << GetLatexString(axisTitles_.at(1)) <<  "},\n"
-		"\t\t\txmin=" << axisLimits_.at(0).first << ", "
-		"xmax=" << axisLimits_.at(0).second << ",\n"
-		"\t\t\tymin=" << axisLimits_.at(1).first << ", "
-		"ymax=" << axisLimits_.at(1).second << ",\n";
-
-	if (options_ != "") {
-		output << "\t\t\t" << options_ << "\n";
-	}
-
-	output << "\t\t]\n\n";
-
-	for (auto plot : plots_) {
-		plot->Write(buf);
-	}
-
-	output <<
-		"\t\\end{axis}\n";
-}

@@ -11,6 +11,7 @@
 #include <vector>
 #include <utility>
 
+#include "TikzOptions.hpp"
 #include "PgfPlotsPlot.hpp"
 
 class PgfPlotsAxis {
@@ -30,24 +31,17 @@ class PgfPlotsAxis {
 		void Write(std::streambuf *buf = std::cout.rdbuf());
 
 	private:
-		/// Generate the tikz plot options for log mode.
-		std::string LogModeOptions();
-
 		/// Vector of registered plots.
 		std::vector< PgfPlotsPlot* > plots_;
 
 		/// Options for the axis command.
-		std::string options_;
+		TikzOptions options_;
 
-		/// Axis titles; x=0, y=1, z=2.
-		std::array< std::string, 3 > axisTitles_;
+		/// The LaTeX command starting the environment.
+		std::string EnvHeader() {return "\\begin{axis}";};
 
-		/// An array of bool indicating if the axis should be in log mode.
-		std::array< bool, 3 > logMode_;
-
-		/// The axis limits: x=0, y=1, z=2; first is min, second is max.
-		std::array< std::pair< double, double >, 3 > axisLimits_;
-
+		/// The LaTeX command ending the environment.
+		std::string EnvFooter() {return "\\end{axis}";};
 };
 
 #endif //PGFPLOTSAXIS_HPP

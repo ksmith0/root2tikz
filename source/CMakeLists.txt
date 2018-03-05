@@ -4,6 +4,7 @@ ROOT_GENERATE_DICTIONARY(root2tikzDict
 	PgfPlotsPlot.hpp
 	PgfPlotsAxis.hpp
 	TikzPicture.hpp
+	TikzOptions.hpp
 	LINKDEF ../include/root2tikz_LinkDef.h
 	MODULE root2tikz)
 
@@ -12,6 +13,7 @@ set(ROOT2TIKZ_SOURCES
 		PgfPlotsPlot.cpp
 		PgfPlotsAxis.cpp
 		TikzPicture.cpp
+		TikzOptions.cpp
 	)
 
 #Create the root2tikz library with the ROOT dictionary.
