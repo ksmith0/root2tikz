@@ -62,7 +62,7 @@ std::string PgfPlotsPlot::PlotTH1(const TH1 *hist, const std::string &options)
 	//Loop over every bin and add a corrdinate for it
 	for (int xbin=1; xbin <= hist->GetNbinsX(); xbin++) {
 		//Suppress the bins containing zero counts to speed up LaTeX rendering.
-		if (hist->GetBinContent(xbin) != 0 && hist->GetBinContent(xbin - 1) != 0) {
+		if (errorMarks || (hist->GetBinContent(xbin) != 0 || hist->GetBinContent(xbin - 1) != 0)) {
 			output << "(";
 			if (includeErrors) output << hist->GetBinCenter(xbin);
 			else output << hist->GetBinLowEdge(xbin);
@@ -73,7 +73,7 @@ std::string PgfPlotsPlot::PlotTH1(const TH1 *hist, const std::string &options)
 	}
 
 	//Add a final coordinate to extend the right edge of the last bin to zero.
-	if (!includeErrors) {
+	if (!includeErrors && hist->GetBinContent(hist->GetNbinsX()) != 0) {
 		output << "(" << hist->GetBinLowEdge(hist->GetNbinsX()) +
 			hist->GetBinWidth(hist->GetNbinsX()) << "," << 0 << ") ";
 	}
