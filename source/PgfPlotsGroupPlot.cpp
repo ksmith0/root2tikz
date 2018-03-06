@@ -5,7 +5,7 @@
 
 PgfPlotsGroupPlot::PgfPlotsGroupPlot(unsigned int rows,
 												 unsigned int columns, std::string options)
-	: PgfPlotsAxis(options)
+	: PgfPlotsAxis(options), globalAxisLimits_({false})
 {
 	options_["group style"] = "{rows=" + std::to_string(rows)
 									  + ", columns=" + std::to_string(columns) + "}";
@@ -102,6 +102,72 @@ void PgfPlotsGroupPlot::PreprocessOptions() {
 	//Determine if spacing needs to be increased.
 	if (!identicalColumnLabels) options_.Add("group/vertical sep=2cm");
 	if (!identicalRowLabels) options_.Add("group/horizontal sep=2cm");
+
+	ProcessGlobalLimits();
+}
+
+
+void PgfPlotsGroupPlot::ProcessGlobalLimits() {
+	for (short axis=0; axis<3; axis++) {
+		if (!globalAxisLimits_[axis]) continue;
+
+		//Determine the option name
+		std::string axisLetter;
+		if (axis == 0) axisLetter = "x";
+		else if (axis == 1) axisLetter = "y";
+		else if (axis == 2) axisLetter = "z";
+		std::string minOptName = axisLetter + "min";
+		std::string maxOptName = axisLetter + "max";
+
+		std::string	&globalMin = options_[minOptName];
+		std::string	&globalMax = options_[maxOptName];
+
+		bool computeLimits = false;
+		//No global limits specified so we compute them.
+		if (globalMin == "" && globalMax == "") computeLimits = true;
+
+		for (auto subPlot : subPlots_) {
+			if (!subPlot) continue;
+			auto plotOptions = subPlot->GetOptions();
+
+			if (computeLimits) {
+				if (plotOptions->IsDefined(minOptName)) {
+					std::string	&min = plotOptions->at(minOptName);
+
+					if (globalMin == ""
+							|| (min != "" && std::stod(min) < std::stod(globalMin))) {
+						globalMin = min;
+					}
+				}
+				if (plotOptions->IsDefined(maxOptName)) {
+					std::string	&max = plotOptions->at(maxOptName);
+					if (globalMax == ""
+							|| (max != "" && std::stod(max) > std::stod(globalMax))) {
+						globalMax = max;
+					}
+				}
+			}
+
+			//Remove subplot limits
+			plotOptions->erase(minOptName);
+			plotOptions->erase(maxOptName);
+		}
+	}
+}
+void PgfPlotsGroupPlot::SetGlobalAxisLimits(short axis, bool limitGlobally) {
+	if (axis > 2) {
+		throw std::runtime_error("Invalid axis, " + std::to_string(axis) + "!");
+	}
+
+	//Handle the negative case recursively.
+	if (axis < 0) {
+		for (int axis=0; axis < 3; axis++) {
+			SetGlobalAxisLimits(axis, limitGlobally);
+		}
+		return;
+	}
+
+	globalAxisLimits_[axis] = limitGlobally;
 }
 
 /** Write the registered plots to the specified buffer.
