@@ -22,24 +22,24 @@ void PgfPlotsAxis::AddPlot(PgfPlotsPlot *plot) {
 	}
 
 	//Get the axis limits.
-	std::string *xmin = &options_["xmin"];
-	if (*xmin == "" || std::stod(*xmin) > hist->GetXaxis()->GetXmin()) {
-		*xmin = std::to_string(hist->GetXaxis()->GetXmin());
+	std::string &xmin = options_["xmin"];
+	if (xmin == "" || std::stod(xmin) > hist->GetXaxis()->GetXmin()) {
+		xmin = std::to_string(hist->GetXaxis()->GetXmin());
 	}
-	std::string *xmax = &options_["xmax"];
-	if (*xmax == "" || std::stod(*xmax) > hist->GetXaxis()->GetXmax()) {
-		*xmax = std::to_string(hist->GetXaxis()->GetXmax());
+	std::string &xmax = options_["xmax"];
+	if (xmax == "" || std::stod(xmax) < hist->GetXaxis()->GetXmax()) {
+		xmax = std::to_string(hist->GetXaxis()->GetXmax());
 	}
 
 	double histYMin, histYMax;
 	hist->GetMinimumAndMaximum(histYMin, histYMax);
-	std::string *ymin = &options_["ymin"];
-	if (*ymin == "" || std::stod(*ymin) > 0.9 * histYMin) {
-		*ymin = std::to_string(0.9 * histYMin);
+	std::string &ymin = options_["ymin"];
+	if (ymin == "" || std::stod(ymin) > 0.9 * histYMin) {
+		ymin = std::to_string(0.9 * histYMin);
 	}
-	std::string *ymax = &options_["ymax"];
-	if (*ymax == "" || std::stod(*ymax) > 1.1 * histYMax) {
-		*ymax = std::to_string(1.1 * histYMax);
+	std::string &ymax = options_["ymax"];
+	if (ymax == "" || std::stod(ymax) < 1.1 * histYMax) {
+		ymax = std::to_string(1.1 * histYMax);
 	}
 }
 
