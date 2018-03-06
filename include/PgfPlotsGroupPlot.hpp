@@ -29,6 +29,8 @@ class PgfPlotsGroupPlot : public PgfPlotsAxis {
 		/// The LaTeX command ending the environment.
 		std::string EnvFooter() {return "\\end{groupplot}";};
 
+		virtual void PreprocessOptions();
+
 		/// Write out the group plot and registered sub plots.
 		void WriteRegisteredItems(std::streambuf *buf);
 };

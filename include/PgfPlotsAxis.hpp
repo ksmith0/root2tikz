@@ -24,6 +24,9 @@ class PgfPlotsAxis {
 		/// Converts a ROOT TLatex string to a valid LaTeX string.
 		static std::string GetLatexString(std::string str);
 
+		/// Return a pointer to the TikzOptions object.
+		TikzOptions* GetOptions() {return &options_;}
+
 		/// Specify the log mode for a given axis.
 		void SetLog(const short &axis, const bool &logMode = true);
 
@@ -43,6 +46,8 @@ class PgfPlotsAxis {
 
 		/// The LaTeX command ending the environment.
 		virtual std::string EnvFooter() {return "\\end{axis}";};
+
+		virtual void PreprocessOptions() {};
 
 		/// Write out all registered items.
 		virtual void WriteRegisteredItems(std::streambuf *buf);

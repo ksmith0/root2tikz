@@ -15,7 +15,9 @@ class TikzOptions : public std::map< std::string, std::string > {
 		TikzOptions(std::string options="");
 
 		/// Add options.
-		void AddOptions(const std::string &options);
+		void Add(const std::string &options);
+
+		bool IsDefined(const std::string &optionName);
 
 		/// Parse an option into name and argument.
 		static std::pair< std::string, std::string> ParseOption(const std::string &option);

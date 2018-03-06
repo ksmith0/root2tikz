@@ -3,7 +3,7 @@
 TikzOptions::TikzOptions(std::string options)
 	: std::map< std::string, std::string >()
 {
-	AddOptions(options);
+	Add(options);
 }
 
 /** Add some tikz options, can be a single options or a list of options
@@ -13,7 +13,7 @@ TikzOptions::TikzOptions(std::string options)
  *
  * \param[in] options The options to be added.
  */
-void TikzOptions::AddOptions(const std::string &options) {
+void TikzOptions::Add(const std::string &options) {
 	//If the string is empty do nothing.
 	if (options == "") return;
 
@@ -37,6 +37,12 @@ void TikzOptions::AddOptions(const std::string &options) {
 	}
 	//Emplace the remaining option.
 	this->emplace(ParseOption(options.substr(start)));
+}
+
+bool TikzOptions::IsDefined(const std::string &optionName) {
+	if (this->find(optionName) == this->end())
+		return false;
+	return true;
 }
 
 /** Parses a tikz option string by separating on the first equal sign.

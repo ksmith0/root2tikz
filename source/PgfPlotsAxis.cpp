@@ -2,7 +2,7 @@
 
 PgfPlotsAxis::PgfPlotsAxis(const std::string &options)
 {
-	options_.AddOptions(options);
+	options_.Add(options);
 }
 
 /** Add a plot to this axis.
@@ -77,6 +77,8 @@ void PgfPlotsAxis::SetLog(const short &axis, const bool &logMode /* = true */) {
  * \param[in] buf The buffer that the plot should be written into.
  */
 void PgfPlotsAxis::Write(std::streambuf *buf) {
+	PreprocessOptions();
+
 	std::ostream output(buf);
 
 	output << "\t" << EnvHeader() << "[\n";
