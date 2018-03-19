@@ -40,9 +40,9 @@ void TikzOptions::Add(const std::string &options) {
 }
 
 bool TikzOptions::IsDefined(const std::string &optionName) {
-	if (this->find(optionName) == this->end())
-		return false;
-	return true;
+	if (this->find(optionName) != this->end())
+		return true;
+	return false;
 }
 
 /** Parses a tikz option string by separating on the first equal sign.

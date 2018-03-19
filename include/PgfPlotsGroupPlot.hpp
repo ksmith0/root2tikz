@@ -21,6 +21,8 @@ class PgfPlotsGroupPlot : public PgfPlotsAxis {
 		/// Get the sub plot object for a given id.
 		PgfPlotsGroupSubPlot* GetSubPlot(unsigned int plotId);
 
+		const std::pair<unsigned short, unsigned short> GetPlotDims();
+
 	private:
 		/// The registered sub plots.
 		std::vector< PgfPlotsGroupSubPlot* > subPlots_;
@@ -33,8 +35,16 @@ class PgfPlotsGroupPlot : public PgfPlotsAxis {
 		/// The LaTeX command ending the environment.
 		std::string EnvFooter() {return "\\end{groupplot}";};
 
+		/// Perform some preprocessing prior to output.
 		virtual void PreprocessOptions();
 
+		/// Determine axis label placement.
+		void ProcessAxisLabels();
+
+		/// Determine axis label placement.
+		void ProcessTickLabels();
+
+		/// Process the axis limits.
 		void ProcessGlobalLimits();
 
 		/// Write out the group plot and registered sub plots.
