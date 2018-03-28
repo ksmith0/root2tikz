@@ -7,11 +7,13 @@
 #define PGFPLOTSAXIS_HPP
 
 #include <array>
+#include <iostream>
 #include <string>
 #include <vector>
 #include <utility>
 
 #include "TikzOptions.hpp"
+#include "PgfPlotsLegend.hpp"
 #include "PgfPlotsPlot.hpp"
 
 class PgfPlotsAxis {
@@ -27,6 +29,9 @@ class PgfPlotsAxis {
 		/// Return a pointer to the TikzOptions object.
 		TikzOptions* GetOptions() {return &options_;}
 
+		/// Set the legend for the axis.
+		void SetLegend(PgfPlotsLegend *legend);
+
 		/// Specify the log mode for a given axis.
 		void SetLog(const short &axis, const bool &logMode = true);
 
@@ -40,6 +45,9 @@ class PgfPlotsAxis {
 	private:
 		/// Vector of registered plots.
 		std::vector< PgfPlotsPlot* > plots_;
+
+		/// Pointer to the legend object.
+		PgfPlotsLegend *legend_;
 
 		/// The LaTeX command starting the environment.
 		virtual std::string EnvHeader() {return "\\begin{axis}";};

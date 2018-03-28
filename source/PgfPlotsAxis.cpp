@@ -1,8 +1,13 @@
 #include "PgfPlotsAxis.hpp"
 
 PgfPlotsAxis::PgfPlotsAxis(const std::string &options)
+	: legend_(nullptr)
 {
 	options_.Add(options);
+}
+
+void PgfPlotsAxis::SetLegend(PgfPlotsLegend *legend) {
+	legend_ = legend;
 }
 
 /** Add a plot to this axis.
@@ -87,7 +92,22 @@ void PgfPlotsAxis::Write(std::streambuf *buf) {
 		output << "\t\t\t" << option.first << "=" << option.second << ",\n";
 	}
 
+	// Write any legend options for the specified legend
+	if (legend_) {
+		auto legendStyle = legend_->GetStyle();
+		if (!legendStyle->empty()) {
+			output << "\t\t\tlegend style={\n";
+			for (auto option : *legendStyle) {
+				output << "\t\t\t\t" << option.first << "=" << option.second << ",\n";
+			}
+			output << "\t\t\t}\n";
+		}
+	}
+
 	output << "\t\t]\n\n";
+
+	// Write the optional legend.
+	if (legend_) legend_->Write(buf);
 
 	WriteRegisteredItems(buf);
 
