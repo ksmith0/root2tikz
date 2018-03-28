@@ -24,6 +24,9 @@ class TikzOptions : public std::map< std::string, std::string > {
 
 		/// Remove leading and trailing whitespace.
 		static std::string Strip(const std::string &str);
+
+		/// Get a string representation of the options.
+		std::string GetString();
 };
 
 #endif // TIKZOPTIONS_HPP

@@ -17,34 +17,50 @@ void PgfPlotsAxis::SetLegend(PgfPlotsLegend *legend) {
 void PgfPlotsAxis::AddPlot(PgfPlotsPlot *plot) {
 	plots_.push_back(plot);
 
-	const TH1* hist = plot->GetHist();
+	auto graph = plot->GetGraph();
+	auto hist = plot->GetHist();
+
+	const TAxis *xAxis, *yAxis;
+	if (hist) {
+		xAxis = hist->GetXaxis();
+		yAxis = hist->GetYaxis();
+	}
+	else if (graph) {
+		xAxis = graph->GetXaxis();
+		yAxis = graph->GetYaxis();
+	}
 
 	if (options_.find("xlabel") == options_.end()) {
-		options_["xlabel"] = "{" + GetLatexString(hist->GetXaxis()->GetTitle()) + "}";
+		options_["xlabel"] = "{" + GetLatexString(xAxis->GetTitle()) + "}";
 	}
 	if (options_.find("ylabel") == options_.end()) {
-		options_["ylabel"] = "{" + GetLatexString(hist->GetYaxis()->GetTitle()) + "}";
+		options_["ylabel"] = "{" + GetLatexString(yAxis->GetTitle()) + "}";
 	}
 
 	//Get the axis limits.
 	std::string &xmin = options_["xmin"];
-	if (xmin == "" || std::stod(xmin) > hist->GetXaxis()->GetXmin()) {
-		xmin = std::to_string(hist->GetXaxis()->GetXmin());
+	if (xmin == "" || std::stod(xmin) > xAxis->GetXmin()) {
+		xmin = std::to_string(xAxis->GetXmin());
 	}
 	std::string &xmax = options_["xmax"];
-	if (xmax == "" || std::stod(xmax) < hist->GetXaxis()->GetXmax()) {
-		xmax = std::to_string(hist->GetXaxis()->GetXmax());
+	if (xmax == "" || std::stod(xmax) < xAxis->GetXmax()) {
+		xmax = std::to_string(xAxis->GetXmax());
 	}
 
-	double histYMin, histYMax;
-	hist->GetMinimumAndMaximum(histYMin, histYMax);
+	//Get the y-axis limits
+	double plotYMin = yAxis->GetXmin();
+	double plotYMax = yAxis->GetXmax();
+	if (hist) {
+		hist->GetMinimumAndMaximum(plotYMin, plotYMax);
+	}
+
 	std::string &ymin = options_["ymin"];
-	if (ymin == "" || std::stod(ymin) > 0.9 * histYMin) {
-		ymin = std::to_string(0.9 * histYMin);
+	if (ymin == "" || std::stod(ymin) > 0.9 * plotYMin) {
+		ymin = std::to_string(0.9 * plotYMin);
 	}
 	std::string &ymax = options_["ymax"];
-	if (ymax == "" || std::stod(ymax) < 1.1 * histYMax) {
-		ymax = std::to_string(1.1 * histYMax);
+	if (ymax == "" || std::stod(ymax) < 1.1 * plotYMax) {
+		ymax = std::to_string(1.1 * plotYMax);
 	}
 }
 

@@ -1,5 +1,7 @@
 #include "TikzOptions.hpp"
 
+#include <sstream>
+
 TikzOptions::TikzOptions(std::string options)
 	: std::map< std::string, std::string >()
 {
@@ -69,4 +71,13 @@ std::string TikzOptions::Strip(const std::string &str) {
 	size_t begin = str.find_first_not_of(" \t\n");
 	size_t end = str.find_last_not_of(" \t\n") + 1;
 	return str.substr(begin, end - begin);
+}
+
+
+std::string TikzOptions::GetString() {
+	std::stringstream output;
+	for (auto option : *this) {
+		output << "\t\t\t" << option.first << "=" << option.second << ",\n";
+	}
+	return output.str();
 }
