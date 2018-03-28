@@ -49,6 +49,8 @@ class PgfPlotsGroupPlot : public PgfPlotsAxis {
 
 		/// Write out the group plot and registered sub plots.
 		void WriteRegisteredItems(std::streambuf *buf);
+
+		void WriteSubPlotPlaceHolder(std::streambuf *buf);
 };
 
 #endif // PGFPLOTSGROUPPLOT_HPP

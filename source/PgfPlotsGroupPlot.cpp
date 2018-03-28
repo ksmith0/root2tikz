@@ -74,7 +74,15 @@ void PgfPlotsGroupPlot::ProcessTickLabels() {
 	for (int row=0; row < rows; ++row) {
 		for (int column=0; column < columns; ++column) {
 			auto subPlot = subPlots_.at(columns * row + column);
-			if (!subPlot) continue;
+			if (!subPlot) {
+				if (row == rows - 1) {
+					identicalColumnLimits = false;
+				}
+				if (column == 0) {
+					identicalRowLimits = false;
+				}
+				continue;
+			}
 
 			auto plotOptions = subPlot->GetOptions();
 
@@ -114,7 +122,15 @@ void PgfPlotsGroupPlot::ProcessAxisLabels() {
 	for (int row=0; row < rows; ++row) {
 		for (int column=0; column < columns; ++column) {
 			auto subPlot = subPlots_.at(columns * row + column);
-			if (!subPlot) continue;
+			if (!subPlot) {
+				if (row == rows - 1) {
+					identicalColumnLabels = false;
+				}
+				if (column == 0) {
+					identicalRowLabels = false;
+				}
+				continue;
+			}
 
 			//Handle column labels (x-axis);
 			const auto &xlabel = subPlot->GetOptions()->at("xlabel");
@@ -233,6 +249,12 @@ void PgfPlotsGroupPlot::SetGlobalAxisLimits(short axis, bool limitGlobally) {
 void PgfPlotsGroupPlot::WriteRegisteredItems(std::streambuf *buf) {
 	for (auto subPlot : subPlots_) {
 		if (subPlot) subPlot->Write(buf);
+		else WriteSubPlotPlaceHolder(buf);
 	}
+}
+
+void PgfPlotsGroupPlot::WriteSubPlotPlaceHolder(std::streambuf *buf) {
+	std::ostream output(buf);
+	output << "\t\t\\nextgroupplot[group/empty plot]\n";
 }
 
