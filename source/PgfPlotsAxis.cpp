@@ -18,12 +18,18 @@ void PgfPlotsAxis::AddPlot(PgfPlotsPlot *plot) {
 	plots_.push_back(plot);
 
 	auto graph = plot->GetGraph();
-	auto hist = plot->GetHist();
+	auto hist1d = plot->GetHist1d();
+	auto hist2d = plot->GetHist2d();
 
-	const TAxis *xAxis, *yAxis;
-	if (hist) {
-		xAxis = hist->GetXaxis();
-		yAxis = hist->GetYaxis();
+	const TAxis *xAxis, *yAxis, *zAxis = nullptr;
+	if (hist1d) {
+		xAxis = hist1d->GetXaxis();
+		yAxis = hist1d->GetYaxis();
+	}
+	else if (hist2d) {
+		xAxis = hist2d->GetXaxis();
+		yAxis = hist2d->GetYaxis();
+		zAxis = hist2d->GetZaxis();
 	}
 	else if (graph) {
 		xAxis = graph->GetXaxis();
@@ -36,8 +42,14 @@ void PgfPlotsAxis::AddPlot(PgfPlotsPlot *plot) {
 	if (options_.find("ylabel") == options_.end()) {
 		options_["ylabel"] = "{" + GetLatexString(yAxis->GetTitle()) + "}";
 	}
+	//z-axis label.
+	if (hist2d && options_.find("colorbar style") == options_.end()) {
+		options_["view"] = "{0}{90}";
+		options_["colorbar"] = "true";
+		options_["colorbar style"] = "{ylabel={" + GetLatexString(zAxis->GetTitle()) + "}}";
+	}
 
-	//Get the axis limits.
+	//Get the x-axis limits.
 	std::string &xmin = options_["xmin"];
 	if (xmin == "" || std::stod(xmin) > xAxis->GetXmin()) {
 		xmin = std::to_string(xAxis->GetXmin());
@@ -50,17 +62,34 @@ void PgfPlotsAxis::AddPlot(PgfPlotsPlot *plot) {
 	//Get the y-axis limits
 	double plotYMin = yAxis->GetXmin();
 	double plotYMax = yAxis->GetXmax();
-	if (hist) {
-		hist->GetMinimumAndMaximum(plotYMin, plotYMax);
+	if (hist1d) {
+		hist1d->GetMinimumAndMaximum(plotYMin, plotYMax);
+	}
+	if (hist1d || graph) {
+		plotYMin *= 0.9;
+		plotYMax *= 1.1;
 	}
 
 	std::string &ymin = options_["ymin"];
-	if (ymin == "" || std::stod(ymin) > 0.9 * plotYMin) {
-		ymin = std::to_string(0.9 * plotYMin);
+	if (ymin == "" || std::stod(ymin) > plotYMin) {
+		ymin = std::to_string(plotYMin);
 	}
 	std::string &ymax = options_["ymax"];
-	if (ymax == "" || std::stod(ymax) < 1.1 * plotYMax) {
-		ymax = std::to_string(1.1 * plotYMax);
+	if (ymax == "" || std::stod(ymax) < plotYMax) {
+		ymax = std::to_string(plotYMax);
+	}
+
+	//Get the z-axis limits
+	if (zAxis) {
+		double plotZMin = zAxis->GetXmin();
+		double plotZMax = zAxis->GetXmax();
+		if (hist2d) {
+			hist2d->GetMinimumAndMaximum(plotZMin, plotZMax);
+		}
+		options_["point meta min"] = std::to_string(plotZMin);
+		options_["point meta max"] = std::to_string(plotZMax);
+		options_["restrict z to domain*"] = std::to_string(plotZMin) + ":"
+		                                    + std::to_string(plotZMax);
 	}
 }
 

@@ -13,6 +13,7 @@
 #include <TNamed.h>
 #include <TGraph.h>
 #include <TH1.h>
+#include <TH2.h>
 
 #include "TikzOptions.hpp"
 
@@ -28,7 +29,8 @@ class PgfPlotsPlot {
 
 		const TNamed* GetObj() {return obj_;};
 		const TGraph* GetGraph() {return dynamic_cast<const TGraph*>(obj_);};
-		const TH1* GetHist() {return dynamic_cast<const TH1*>(obj_);};
+		const TH1* GetHist1d();
+		const TH2* GetHist2d() {return dynamic_cast<const TH2*>(obj_);};
 
 		/// Return a pointer to the TikzOptions object.
 		TikzOptions* GetOptions() {return &options_;}
@@ -43,6 +45,8 @@ class PgfPlotsPlot {
 		static std::string PlotTGraph(const TGraph *graph,
 		                              const std::string &rootStyle="",
 		                              const std::string &options="");
+		static std::string PlotTH2(const TH2 *hist, const std::string &rootStyle="",
+		                           const std::string &options="");
 
 		/// Write out the plot.
 		void Write(std::streambuf *buf = std::cout.rdbuf());

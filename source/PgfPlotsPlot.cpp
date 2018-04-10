@@ -27,6 +27,11 @@ void PgfPlotsPlot::AddNode(const std::string nodeLabel,
 	nodes_.push_back(std::make_pair(nodeLabel, nodeOptions));
 }
 
+const TH1* PgfPlotsPlot::GetHist1d() {
+	if (GetHist2d()) return nullptr;
+	return dynamic_cast<const TH1*>(obj_);
+}
+
 /**
  * \param[in] hist Pointer to the histogram to be plotted.
  * \param[in] rootStyle The options to use when plotting the histogram. Currently
@@ -43,6 +48,12 @@ std::string PgfPlotsPlot::PlotTH1(const TH1 *hist,
                                   const std::string &rootStyle,
                                   const std::string &options)
 {
+	//If this is a TH2 we want to call PlotTH2
+	const TH2* h2 = dynamic_cast<const TH2*>(hist);
+	if (h2) {
+		return PlotTH2(h2, rootStyle, options);
+	}
+
 	bool includeErrors = false; //Include errors, shows only the error bars, no markers. ROOT option E.
 	bool errorMarks = false; //Small lines are darwn at end of the error bars and markers are shown. ROOT option E1.
 	if (rootStyle.find("E") != std::string::npos) includeErrors = true;
@@ -148,11 +159,68 @@ std::string PgfPlotsPlot::PlotTGraph(const TGraph *graph,
 	return output.str();
 }
 
+/**By default creates a TikZ matrix plot which is typically used to plot values
+ * in a matrix, but can be easily adapted to a two-dimensional histogram. A
+ * matrix plot requires that all bins are defined, and thus the option
+ * "restrict z to domain*" is used so that empty bins are set to the minimum
+ * value. If the option "SURF" is provided a surface plot is created instead,
+ * this type of plot requires data at the corners to be provided and thus plots
+ * one less bin than is contained in the input histogram.
+ *
+ * \param[in] hist Pointer to the histogram to be plotted.
+ * \param[in] rootStyle The options to use when plotting the histogram.
+ * \param[in] options Options to the pgfplots plot command.
+ */
+std::string PgfPlotsPlot::PlotTH2(const TH2 *hist,
+                                  const std::string &rootStyle,
+                                  const std::string &options)
+{
+	bool surfPlot = false;
+	if (rootStyle.find("SURF") != std::string::npos) {
+		surfPlot = true;
+	}
+
+	std::stringstream output;
+
+	output <<
+		"\t\\addplot3[";
+	if (surfPlot) output << "surf,";
+	else output <<	"matrix plot*, \%Similar to `surf`.";
+	output << "\n"
+			"\t\tshader = flat corner, \n"
+			"\t\t\%Ordering of the coordinate data:\n"
+			"\t\tmesh/cols=" << hist->GetNbinsX() << ", "
+			"mesh/rows=" << hist->GetNbinsY() << ", "
+			"mesh/ordering=rowwise]\n"
+		"\t\tcoordinates {\n";
+
+	for (int ybin=1; ybin<= hist->GetNbinsY(); ybin++) {
+		output << "\t\t\t";
+		double yvalue;
+		if (surfPlot) yvalue = hist->GetYaxis()->GetBinLowEdge(ybin);
+		else yvalue = hist->GetYaxis()->GetBinCenter(ybin);
+		for (int xbin=1; xbin<= hist->GetNbinsX(); xbin++) {
+			double xvalue;
+			if (surfPlot) xvalue = hist->GetXaxis()->GetBinLowEdge(xbin);
+			else xvalue = hist->GetXaxis()->GetBinCenter(xbin);
+			double weight = hist->GetBinContent(xbin, ybin);
+			output << "(" << xvalue << "," << yvalue << "," << weight << ") ";
+		}
+		output << "\n";
+	}
+
+	//Coordinate list trailer.
+	output << "\t\t};\n";
+
+	return output.str();
+}
 void PgfPlotsPlot::Write(std::streambuf *buf) {
 	std::string plot_str;
-	auto hist = GetHist();
+	auto hist1d = GetHist1d();
+	auto hist2d = GetHist2d();
 	auto graph = GetGraph();
-	if (hist) plot_str = PlotTH1(hist, rootStyle_, options_.GetString());
+	if (hist1d) plot_str = PlotTH1(hist1d, rootStyle_, options_.GetString());
+	else if (hist2d) plot_str = PlotTH2(hist2d, rootStyle_, options_.GetString());
 	else if (graph) plot_str = PlotTGraph(graph, rootStyle_, options_.GetString());
 	size_t loc = plot_str.find_last_of("}") + 1;
 	for (auto nodeInfo : nodes_) {
