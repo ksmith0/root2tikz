@@ -23,6 +23,9 @@ class PgfPlotsGroupPlot : public PgfPlotsAxis {
 
 		const std::pair<unsigned short, unsigned short> GetPlotDims();
 
+		/// Set the sub plot object for a given id.
+		void SetSubPlot(unsigned int plotId, PgfPlotsGroupSubPlot* subPlot);
+
 	private:
 		/// The registered sub plots.
 		std::vector< PgfPlotsGroupSubPlot* > subPlots_;

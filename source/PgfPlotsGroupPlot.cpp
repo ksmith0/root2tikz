@@ -51,6 +51,15 @@ PgfPlotsGroupSubPlot* PgfPlotsGroupPlot::GetSubPlot(unsigned int plotId) {
 	return subPlot;
 }
 
+void PgfPlotsGroupPlot::SetSubPlot(unsigned int plotId,
+                                   PgfPlotsGroupSubPlot* subPlot)
+{
+	if (plotId >= subPlots_.size())
+		throw std::runtime_error("ERROR: Invalid plot id, " + std::to_string(plotId) + "!");
+
+	subPlots_.at(plotId) = subPlot;
+}
+
 void PgfPlotsGroupPlot::PreprocessOptions() {
 	ProcessGlobalLimits();
 	ProcessAxisLabels();
