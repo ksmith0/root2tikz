@@ -30,6 +30,9 @@ class PgfPlotsPlot {
 		const TGraph* GetGraph() {return dynamic_cast<const TGraph*>(obj_);};
 		const TH1* GetHist() {return dynamic_cast<const TH1*>(obj_);};
 
+		/// Return a pointer to the TikzOptions object.
+		TikzOptions* GetOptions() {return &options_;}
+
 		/// Generate the string to create a node for a plot.
 		static std::string NodeString(std::string nodeLabel,
 		                              std::string nodeOptions="");
