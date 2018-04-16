@@ -108,11 +108,20 @@ void PgfPlotsGroupPlot::ProcessTickLabels() {
 			else if (rowLimits[row] != ylimits) identicalRowLimits = false;
 		}
 	}
+
+	//If the user has defined how to handle this we ignore the fact that they are identical.
+	if (options_.IsDefined("group/xticklabels at"))  {
+		identicalColumnLimits = false;
+	}
+	if (options_.IsDefined("group/yticklabels at"))  {
+		identicalRowLimits = false;
+	}
+
 	//Set the global tick labels
-	if (identicalColumnLimits)  {
+	if (identicalColumnLimits) {
 		options_.Add("group/xticklabels at=edge bottom");
 	}
-	if (identicalRowLimits)  {
+	if (identicalRowLimits) {
 		options_.Add("group/yticklabels at=edge left");
 	}
 }
@@ -162,6 +171,14 @@ void PgfPlotsGroupPlot::ProcessAxisLabels() {
 	}
 	for (auto label : rowLabels) {
 		if (label != "" && label != rowLabels[0]) identicalRowLabels = false;
+	}
+
+	//If the user has defined how to handle this we ignore the fact that they are identical.
+	if (options_.IsDefined("group/xlabels at"))  {
+		identicalColumnLabels = false;
+	}
+	if (options_.IsDefined("group/ylabels at"))  {
+		identicalRowLabels = false;
 	}
 
 	//Set the global labels
