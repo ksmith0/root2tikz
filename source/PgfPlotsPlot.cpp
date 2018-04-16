@@ -188,6 +188,7 @@ std::string PgfPlotsPlot::PlotTH2(const TH2 *hist,
 	else output <<	"matrix plot*, \%Similar to `surf`.";
 	output << "\n"
 			"\t\tshader = flat corner, \n"
+			"\t\topacity=ceil(\\pgfplotspointmetatransformed),\n"
 			"\t\t\%Ordering of the coordinate data:\n"
 			"\t\tmesh/cols=" << hist->GetNbinsX() << ", "
 			"mesh/rows=" << hist->GetNbinsY() << ", "
