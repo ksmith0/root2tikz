@@ -56,29 +56,33 @@ std::string PgfPlotsPlot::PlotTH1(const TH1 *hist,
 
 	bool includeErrors = false; //Include errors, shows only the error bars, no markers. ROOT option E.
 	bool errorMarks = false; //Small lines are darwn at end of the error bars and markers are shown. ROOT option E1.
+	bool histPlot = true; //Connect the point with a line
 	if (rootStyle.find("E") != std::string::npos) includeErrors = true;
 	if (rootStyle.find("E1") != std::string::npos) errorMarks = true;
+	if (rootStyle != "" && rootStyle.find("HIST") == std::string::npos) histPlot = false;
 
 	std::stringstream output;
 
 	//Setup the plot style
 	output << "\t\\addplot+[";
 
-	//If th e error option was indicated
+	if (histPlot) output << "const plot, ";
+	//If the error option was indicated
 	if (includeErrors) {
 		// exclude markers if not requested.
 		if (!errorMarks) output << "scatter, mark=none, ";
 		//Remove the line connecting the points.
-		output << "only marks, ";
+		if (!histPlot) output << "only marks, ";
 		//Setup the error bars.
 		output << "error bars/.cd, y dir=both, y explicit, x dir=both, x explicit";
 		//Remove the edges (marks) at the end of the error bars.
 		if (!errorMarks) output << ", error mark = none";
 	}
-	//Otherwise we use a const plot iwth no marks to show bins.
-	else output << "const plot, no marks";
+	//Otherwise we use a const plot with no marks to show bins.
+	else output << "no marks,\n";
+	output << options;
 
-	output << "]\n";
+	output << "\t]\n";
 
 	//Begin the cooridnate list
 	output << "\t\tcoordinates { ";
@@ -101,6 +105,8 @@ std::string PgfPlotsPlot::PlotTH1(const TH1 *hist,
 
 	//Add a final coordinate to extend the right edge of the last bin to zero.
 	if (!includeErrors && hist->GetBinContent(hist->GetNbinsX()) != 0) {
+		output << "(" << hist->GetBinLowEdge(hist->GetNbinsX()) +
+			hist->GetBinWidth(hist->GetNbinsX()) << "," << hist->GetBinContent(hist->GetNbinsX()) << ") ";
 		output << "(" << hist->GetBinLowEdge(hist->GetNbinsX()) +
 			hist->GetBinWidth(hist->GetNbinsX()) << "," << 0 << ") ";
 	}
@@ -143,7 +149,7 @@ std::string PgfPlotsPlot::PlotTGraph(const TGraph *graph,
 	if (!marks) output << "\t\t\tmark=none,\n";
 	output << options;
 
-	output << "\t\t]\n";
+	output << "\t]\n";
 
 	//Begin the cooridnate list
 	output << "\t\tcoordinates { ";
@@ -192,7 +198,9 @@ std::string PgfPlotsPlot::PlotTH2(const TH2 *hist,
 			"\t\t\%Ordering of the coordinate data:\n"
 			"\t\tmesh/cols=" << hist->GetNbinsX() << ", "
 			"mesh/rows=" << hist->GetNbinsY() << ", "
-			"mesh/ordering=rowwise]\n"
+			"mesh/ordering=rowwise,";
+	output << options;
+	output << "\t]\n"
 		"\t\tcoordinates {\n";
 
 	for (int ybin=1; ybin<= hist->GetNbinsY(); ybin++) {
